@@ -33,11 +33,30 @@ public class ColorsActivity extends AppCompatActivity {
      */
     private MediaPlayer mMediaPlayer;
     private AudioManager am;
+    AudioManager.OnAudioFocusChangeListener afChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int i) {
+            if (i == AudioManager.AUDIOFOCUS_GAIN) {
+                mMediaPlayer.start();
+            } else if (i == AudioManager.AUDIOFOCUS_LOSS) {
+                mMediaPlayer.stop();
+                releaseMediaPlayer();
+            } else if (i == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+                mMediaPlayer.pause();
+                mMediaPlayer.seekTo(0);
+            } else if (i == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
+                mMediaPlayer.pause();
+                mMediaPlayer.seekTo(0);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.word_list);
+
+//        getActionBar().setDisplayShowHomeEnabled(true);
 
         am = (AudioManager) ColorsActivity.this.getSystemService(Context.AUDIO_SERVICE);
 
@@ -103,24 +122,6 @@ public class ColorsActivity extends AppCompatActivity {
         super.onStop();
         releaseMediaPlayer();
     }
-
-    AudioManager.OnAudioFocusChangeListener afChangeListener = new AudioManager.OnAudioFocusChangeListener() {
-        @Override
-        public void onAudioFocusChange(int i) {
-            if (i == AudioManager.AUDIOFOCUS_GAIN) {
-                mMediaPlayer.start();
-            } else if (i == AudioManager.AUDIOFOCUS_LOSS) {
-                mMediaPlayer.stop();
-                releaseMediaPlayer();
-            } else if (i == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
-                mMediaPlayer.pause();
-                mMediaPlayer.seekTo(0);
-            } else if (i == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
-                mMediaPlayer.pause();
-                mMediaPlayer.seekTo(0);
-            }
-        }
-    };
 
     /**
      * Clean up the media player by releasing its resources.
